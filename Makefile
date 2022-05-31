@@ -123,6 +123,33 @@ PossibleOptions/fast:
 	$(MAKE) -f CMakeFiles/PossibleOptions.dir/build.make CMakeFiles/PossibleOptions.dir/build
 .PHONY : PossibleOptions/fast
 
+src/GraphicKey.o: src/GraphicKey.cpp.o
+
+.PHONY : src/GraphicKey.o
+
+# target to build an object file
+src/GraphicKey.cpp.o:
+	$(MAKE) -f CMakeFiles/PossibleOptions.dir/build.make CMakeFiles/PossibleOptions.dir/src/GraphicKey.cpp.o
+.PHONY : src/GraphicKey.cpp.o
+
+src/GraphicKey.i: src/GraphicKey.cpp.i
+
+.PHONY : src/GraphicKey.i
+
+# target to preprocess a source file
+src/GraphicKey.cpp.i:
+	$(MAKE) -f CMakeFiles/PossibleOptions.dir/build.make CMakeFiles/PossibleOptions.dir/src/GraphicKey.cpp.i
+.PHONY : src/GraphicKey.cpp.i
+
+src/GraphicKey.s: src/GraphicKey.cpp.s
+
+.PHONY : src/GraphicKey.s
+
+# target to generate assembly for a file
+src/GraphicKey.cpp.s:
+	$(MAKE) -f CMakeFiles/PossibleOptions.dir/build.make CMakeFiles/PossibleOptions.dir/src/GraphicKey.cpp.s
+.PHONY : src/GraphicKey.cpp.s
+
 src/main.o: src/main.cpp.o
 
 .PHONY : src/main.o
@@ -159,6 +186,9 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
 	@echo "... PossibleOptions"
+	@echo "... src/GraphicKey.o"
+	@echo "... src/GraphicKey.i"
+	@echo "... src/GraphicKey.s"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"
