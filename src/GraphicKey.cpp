@@ -1,7 +1,7 @@
 #include "GraphicKey.h"
 
-//namespace GRAPHICKEY
-//{
+namespace GRAPHICKEY
+{
 //==================================================================================================
 //    PatternForPossibleCombinations class function implementation
 //==================================================================================================
@@ -137,7 +137,7 @@
         ///
     }
 
-    uint16_t GraphicKey::countCodes(char start, int16_t length)
+    uint32_t GraphicKey::countCodes(char start, int16_t length)
     {
         if((start < 'A' && start > 'I')) //(start < 'a' && start > 'i')
             return 0;
@@ -154,18 +154,18 @@
 
         struct sDraftTree draftTree = { nullptr, pos, START, length};
 
-        uint16_t res = counterOfSuccess(&draftTree);
+        uint32_t res = counterOfSuccess(&draftTree);
 
         return res;
     }
 
-    uint16_t GraphicKey::counterOfSuccess(struct sDraftTree* pDraftTree)
+    uint32_t GraphicKey::counterOfSuccess(struct sDraftTree* pDraftTree)
     {
-        uint16_t countOfSuccess = 0;
+        uint32_t countOfSuccess = 0;
 
 
         //limit the check. no START direction
-        for(int16_t pattern = 1; pattern < m_PatternCount; pattern ++)
+        for(uint16_t pattern = 1; pattern < m_PatternCount; pattern ++)
         {
             int16_t unocPosition = turnDirAndCheck(pDraftTree, (eDirection)pattern);
             if(unocPosition == -1)
@@ -215,4 +215,4 @@
 
         return newPos;
     }    
-//}
+}

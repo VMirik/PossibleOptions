@@ -3,8 +3,8 @@
 #include <iostream>
 
 
-//namespace GRAPHICKEY
-//{
+namespace GRAPHICKEY
+{
 
 typedef enum
 {
@@ -16,11 +16,19 @@ typedef enum
     DIAGONAL_45_LEFT_UP,
     DIAGONAL_45_RIGHT_UP,
     DIAGONAL_45_LEFT_DOWN,
-    DIAGONAL_45_RIGHT_DOWN
+    DIAGONAL_45_RIGHT_DOWN,
+    DIAGONAL_SHARP_MLEFT_M2UP,
+    DIAGONAL_SHARP_M2LEFT_MUP,
+    DIAGONAL_SHARP_M2LEFT_DOWN,
+    DIAGONAL_SHARP_MLEFT_2DOWN,
+    DIAGONAL_SHARP_RIGHT_2DOWN,
+    DIAGONAL_SHARP_2RIGHT_DOWN,
+    DIAGONAL_SHARP_2RIGHT_MDOWN,
+    DIAGONAL_SHARP_RIGHT_M2DOWN
 } eDirection;
 
 
-struct sPatternForPossibleCombinations
+struct __attribute__ ((__packed__))sPatternForPossibleCombinations
 {
     struct sPatternForPossibleCombinations* parent;
     int16_t leftRigth;
@@ -42,11 +50,12 @@ struct sPatternForPossibleCombinations
     ~sPatternForPossibleCombinations(){if(this->parent != nullptr) delete this->parent;}
 };
 
-
-class Uncopyable {
-protected:
-  Uncopyable(const Uncopyable&);
-  Uncopyable& operator=(const Uncopyable&);
+struct __attribute__ ((__packed__))sDraftTree
+{
+    struct sDraftTree* parent;
+    int16_t pos;
+    eDirection dirPatternNum;
+    int16_t numberToFinish;
 };
 
 //==================================================================================================
@@ -79,18 +88,17 @@ public:
     bool AddNewPattern(int16_t leftRigth, int16_t upDown, eDirection dirPatternNum);
     
     /**
-    * Sum numbers in a vector.
+    * Get number of patterns.
     *
-    * @param values Container whose values are summed.
-    * @return sum of `values`, or 0.0 if `values` is empty.
+    * @return count.
     */
     uint8_t GetPatternCount();
     
     /**
-    * Sum numbers in a vector.
+    * Get pattern structure.
     *
-    * @param values Container whose values are summed.
-    * @return sum of `values`, or 0.0 if `values` is empty.
+    * @param pos Enum named after patern.
+    * @return    structure with settings.
     */
     struct sPatternForPossibleCombinations* GetPattern(eDirection pos);
 };
@@ -110,20 +118,28 @@ public:
     GraphicKeyCard(int16_t keyCardLength = 3, int16_t keyCardWidth = 3);
     ~GraphicKeyCard();
 
+    /**
+    * Create workspace.
+    *
+    * @param keyCardLength table Length. To define the working area.
+    * @param keyCardWidth  table width. To define the working area.
+    * @return    execution success.
+    */
     bool SetFieldKeyCard(int16_t keyCardLength, int16_t keyCardWidth);
+    
+    
     int16_t getKeyCardLength();
     int16_t getKeyCardWidth();
     int16_t getKeyCardSize();
 
+    /**
+    * Finding a position on the field using a pattern.
+    *
+    * @param curPos         current position.
+    * @param dirPatternNum  pattern name (look in enum).
+    * @return               Found new position. if failure then -1.
+    */
     uint16_t lookPosition(int16_t curPos, eDirection dirPatternNum);
-};
-
-struct sDraftTree
-{
-    struct sDraftTree* parent;
-    int16_t pos;
-    eDirection dirPatternNum;
-    int16_t numberToFinish;
 };
 
 //==================================================================================================
@@ -135,13 +151,25 @@ class GraphicKey: public GraphicKeyCard
 private:
 
     int16_t turnDirAndCheck(struct sDraftTree* pDraftTree, eDirection pattern);
-    uint16_t counterOfSuccess(struct sDraftTree* pDraftTree);
+    uint32_t counterOfSuccess(struct sDraftTree* pDraftTree);
+
 public:
     GraphicKey();
     ~GraphicKey();
-    
-    uint16_t countCodes(char start = 'A', int16_t length = 7);
+
+   /**
+    * Starting function for searching for possible variants 
+    * of a graphic key using patterns and a given length
+    *
+    * @param start          sign value A-Z.c
+    *                       orresponds to the position on the table
+    * @param length         pattern password length.
+    * @return               Found result. The number of possible 
+    *                       combinations in the specified 
+    *                       area and length
+    */
+    uint32_t countCodes(char start = 'A', int16_t length = 7);
 
 };
-//}
+}
 #endif /* GRAPHICKEY_H_ */
