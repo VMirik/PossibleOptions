@@ -1,7 +1,7 @@
 #ifndef GRAPHICKEY_H_
 #define GRAPHICKEY_H_
 #include <iostream>
-
+#include <cstring>
 
 namespace GRAPHICKEY
 {
@@ -50,13 +50,6 @@ struct __attribute__ ((__packed__))sPatternForPossibleCombinations
     ~sPatternForPossibleCombinations(){if(this->parent != nullptr) delete this->parent;}
 };
 
-struct __attribute__ ((__packed__))sDraftTree
-{
-    struct sDraftTree* parent;
-    int16_t pos;
-    eDirection dirPatternNum;
-    int16_t numberToFinish;
-};
 
 //==================================================================================================
 //    PatternForPossibleCombinations class function Declaration
@@ -113,6 +106,8 @@ protected:
     int16_t m_keyCardLength;
     int16_t m_keyCardWidth;
     int16_t m_keyCardSize;
+    
+    bool *m_pAreaBuff;
 
 public:
     GraphicKeyCard(int16_t keyCardLength = 3, int16_t keyCardWidth = 3);
@@ -150,8 +145,8 @@ class GraphicKey: public GraphicKeyCard
 {
 private:
 
-    int16_t turnDirAndCheck(struct sDraftTree* pDraftTree, eDirection pattern);
-    uint32_t counterOfSuccess(struct sDraftTree* pDraftTree);
+    int16_t turnDirAndCheck(int16_t pos, eDirection pattern);
+    uint32_t counterOfSuccess(int16_t pos, int16_t length);
 
 public:
     GraphicKey();

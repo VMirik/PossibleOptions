@@ -63,14 +63,15 @@ namespace GRAPHICKEY
         PatternForPossibleCombinations(),
         m_keyCardLength(keyCardLength),
         m_keyCardWidth(keyCardWidth),
-        m_keyCardSize(keyCardLength*keyCardWidth)
+        m_keyCardSize(keyCardLength*keyCardWidth),
+        m_pAreaBuff(new bool[m_keyCardSize])
     {
-         ///
+         std::memset(m_pAreaBuff, false, m_keyCardSize);
     }
     
     GraphicKeyCard::~GraphicKeyCard()
     {
-        ///
+        delete[] m_pAreaBuff;
     }
 
     int16_t GraphicKeyCard::getKeyCardLength()
@@ -150,16 +151,14 @@ namespace GRAPHICKEY
         if(pos >= m_keyCardSize)
             return 0;
 
-        length -= 1U;
+        m_pAreaBuff[pos] = true;
 
-        struct sDraftTree draftTree = { nullptr, pos, START, length};
-
-        uint32_t res = counterOfSuccess(&draftTree);
+        uint32_t res = counterOfSuccess(pos, length - 1);
 
         return res;
     }
 
-    uint32_t GraphicKey::counterOfSuccess(struct sDraftTree* pDraftTree)
+    uint32_t GraphicKey::counterOfSuccess(int16_t pos, int16_t length)
     {
         uint32_t countOfSuccess = 0;
 
@@ -167,15 +166,15 @@ namespace GRAPHICKEY
         //limit the check. no START direction
         for(uint16_t pattern = 1; pattern < m_PatternCount; pattern ++)
         {
-            int16_t unocPosition = turnDirAndCheck(pDraftTree, (eDirection)pattern);
+            int16_t unocPosition = turnDirAndCheck(pos, (eDirection)pattern);
             if(unocPosition == -1)
                 continue;
-
-            if(pDraftTree->numberToFinish > 1)
+            
+            if(length > 1)
             {
-                int16_t length = pDraftTree->numberToFinish - 1U;
-                struct sDraftTree newDraft = { pDraftTree, unocPosition, (eDirection)pattern, length};
-                countOfSuccess += counterOfSuccess(&newDraft);
+                m_pAreaBuff[unocPosition] = true;
+                countOfSuccess += counterOfSuccess(unocPosition, length - 1);
+                m_pAreaBuff[unocPosition] = false;
             }
             else
                 countOfSuccess ++;
@@ -184,35 +183,23 @@ namespace GRAPHICKEY
         return countOfSuccess;
     }
 
-    int16_t GraphicKey::turnDirAndCheck(struct sDraftTree* pDraftTree, eDirection pattern)
+    int16_t GraphicKey::turnDirAndCheck(int16_t pos, eDirection pattern)
     {
         int16_t newPos = -1;
 
-        newPos = lookPosition(pDraftTree->pos, pattern);
+        newPos = lookPosition(pos, pattern);
 
         //position is out of the table
         if(newPos <= -1 || newPos >= m_keyCardSize)
             return -1;
 
-
-        struct sDraftTree* pDraftTreeParent = pDraftTree->parent;
-
-        while(pDraftTreeParent != nullptr)
+        if(m_pAreaBuff[newPos]) //position exist and selected
         {
-            if(pDraftTreeParent->pos == newPos) //position exist and selected
-            {
-                // try to look beyond this point which is already occupied
-                // WARNING : THIS METHOD SHOULD STOP WHEN IT BREAKS INTO LIMITS
-                // OR FINDS AN EMPTY POSITION. It doesn't break the rules :)
-                int16_t length = pDraftTree->numberToFinish - 1U;
-                struct sDraftTree testDraft = { pDraftTree, newPos, pattern, length};
-                
-                newPos = turnDirAndCheck(&testDraft, pattern);
-                break;
-            }
-            pDraftTreeParent = pDraftTreeParent->parent;
+            // try to look beyond this point which is already occupied
+            // WARNING : THIS METHOD SHOULD STOP WHEN IT BREAKS INTO LIMITS
+            // OR FINDS AN EMPTY POSITION. It doesn't break the rules :)
+            newPos = turnDirAndCheck(newPos, pattern);
         }
-
         return newPos;
-    }    
+    }   
 }
